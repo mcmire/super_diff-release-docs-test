@@ -178,6 +178,8 @@ jobs:
     needs:
       - collect-release-info
       - collect-docsite-release-info
+      # This already runs if there are docs changes to publish, so we don't need
+      # to check that here
       - build-docsite
     steps:
       - uses: actions/checkout@v4
@@ -189,7 +191,7 @@ jobs:
           path: site
           key: docsite-${{ github.sha }}
       - name: Update redirect in index (for a release)
-        if: ${{ github.event_name == 'push' && github.ref_name == 'main' && needs.collect-release-info.outputs.IS_NEW_RELEASE == 'true' }}
+        if: ${{ needs.collect-release-info.outputs.IS_NEW_RELEASE == 'true' }}
         run: |
           cat <<-EOT > index.html
             <!DOCTYPE html>
