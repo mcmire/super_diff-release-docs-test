@@ -193,18 +193,19 @@ jobs:
       - name: Update redirect in index (for a release)
         if: ${{ needs.collect-release-info.outputs.IS_NEW_RELEASE == 'true' }}
         run: |
+          url="https://${GITHUB_REPOSITORY_OWNER}.github.com/${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}/releases/${RELEASE_VERSION}"
           cat <<-EOT > index.html
             <!DOCTYPE html>
             <html>
             <head>
               <title>SuperDiff Documentation</title>
-              <meta http-equiv="refresh" content="0; url='https://mcmire.github.com/super_diff/releases/${RELEASE_VERSION}'" />
+              <meta http-equiv="refresh" content="0; url='${url}'" />
             </head>
             <body>
               <p>
                 This page has moved to a different URL.
                 Please click
-                <a href="https://mcmire.github.com/super_diff/releases/${RELEASE_VERSION}">
+                <a href="${url}">
                   this link
                 </a>
                 if you are not redirected.
