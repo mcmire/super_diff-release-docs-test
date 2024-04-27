@@ -12,3 +12,5 @@ to intelligently display the differences between two data structures of any type
 - [Learn how to use SuperDiff ➤](./users/index.md)
 - [Learn how to contribute to SuperDiff and dive into the source code ➤](./contributors/index.md)
 - [File a bug, submit a feature request, or suggest another change ➤](https://github.com/mcmire/super_diff/issues)
+
+Hello!
