@@ -123,22 +123,22 @@ jobs:
           if [[ "$IS_NEW_RELEASE" == "true" ]]; then
             DOCSITE_RELEASE_VERSION="$RELEASE_VERSION"
             DOCSITE_DESTINATION_PATH="releases/$RELEASE_VERSION"
-            HAS_CHANGES_TO_DOCS="true"
+            HAS_DOCS_CHANGES_TO_RELEASE="true"
           else
             DOCSITE_RELEASE_VERSION="$COMMIT_ID"
             DOCSITE_DESTINATION_PATH="branches/$BRANCH_NAME/$COMMIT_ID"
             # Check if there any changes to docs/
             if git diff --quiet --merge-base "origin/$GITHUB_BASE_REF" -- docs; then
-              HAS_CHANGES_TO_DOCS="false"
+              HAS_DOCS_CHANGES_TO_RELEASE="false"
             else
-              HAS_CHANGES_TO_DOCS="true"
+              HAS_DOCS_CHANGES_TO_RELEASE="true"
             fi
           fi
 
           {
             echo "DOCSITE_RELEASE_VERSION=$DOCSITE_RELEASE_VERSION"
             echo "DOCSITE_DESTINATION_PATH=$DOCSITE_DESTINATION_PATH"
-            echo "HAS_CHANGES_TO_DOCS=$HAS_CHANGES_TO_DOCS"
+            echo "HAS_DOCS_CHANGES_TO_RELEASE=$HAS_DOCS_CHANGES_TO_RELEASE"
           } >> "$GITHUB_OUTPUT"
         env:
           IS_NEW_RELEASE: ${{ needs.collect-release-info.outputs.IS_NEW_RELEASE }}
@@ -148,7 +148,7 @@ jobs:
     outputs:
       DOCSITE_RELEASE_VERSION: ${{ steps.command.outputs.DOCSITE_RELEASE_VERSION }}
       DOCSITE_DESTINATION_PATH: ${{ steps.command.outputs.DOCSITE_DESTINATION_PATH }}
-      HAS_CHANGES_TO_DOCS: ${{ steps.command.outputs.HAS_CHANGES_TO_DOCS }}
+      HAS_DOCS_CHANGES_TO_RELEASE: ${{ steps.command.outputs.HAS_DOCS_CHANGES_TO_RELEASE }}
 
   build-docsite:
     runs-on: ubuntu-latest
@@ -156,7 +156,7 @@ jobs:
       - analyze
       - collect-release-info
       - collect-docsite-release-info
-    if: ${{ github.event_name == 'pull_request' && ((needs.collect-release-info.outputs.IS_NEW_RELEASE == 'false' && needs.collect-docsite-release-info.outputs.HAS_CHANGES_TO_DOCS == 'true') || (needs.collect-release-info.outputs.IS_NEW_RELEASE == 'true' && github.event.merged)) }}
+    if: ${{ needs.collect-docsite-release-info.outputs.HAS_DOCS_CHANGES_TO_RELEASE == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
@@ -189,7 +189,7 @@ jobs:
           path: site
           key: docsite-${{ github.sha }}
       - name: Update redirect in index (for a release)
-        if: ${{ needs.collect-release-info.outputs.IS_NEW_RELEASE == 'true' }}
+        if: ${{ github.event_name == 'push' && github.ref_name == 'main' && needs.collect-release-info.outputs.IS_NEW_RELEASE == 'true' }}
         run: |
           cat <<-EOT > index.html
             <!DOCTYPE html>
