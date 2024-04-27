@@ -120,7 +120,7 @@ jobs:
         run: |
           set -x
 
-          if [[ "$IS_NEW_RELEASE" == "true" ]]; then
+          if [[ "$GITHUB_EVENT_NAME" == "push" && "$GITHUB_REF_NAME" == "main" && "$IS_NEW_RELEASE" == "true" ]]; then
             DOCSITE_RELEASE_VERSION="$RELEASE_VERSION"
             DOCSITE_DESTINATION_PATH="releases/$RELEASE_VERSION"
             HAS_DOCS_CHANGES_TO_RELEASE="true"
