@@ -193,7 +193,7 @@ jobs:
       - name: Update redirect in index (for a release)
         if: ${{ needs.collect-release-info.outputs.IS_NEW_RELEASE == 'true' }}
         run: |
-          url="https://${GITHUB_REPOSITORY_OWNER}.github.com/${GITHUB_REPOSITORY#"${GITHUB_REPOSITORY_OWNER}/"}/releases/${RELEASE_VERSION}"
+          url="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#"${GITHUB_REPOSITORY_OWNER}/"}/releases/${DOCSITE_RELEASE_VERSION}"
           cat <<-EOT > index.html
             <!DOCTYPE html>
             <html>
@@ -213,6 +213,8 @@ jobs:
             </body>
             </html>
           EOT
+        env:
+          DOCSITE_RELEASE_VERSION: ${{ needs.collect-docsite-release-info.outputs.DOCSITE_RELEASE_VERSION }}
       - name: Copy site/ to ${{ needs.collect-docsite-release-info.outputs.DOCSITE_DESTINATION_PATH }}
         run: |
           mkdir -p "$(dirname "$DOCSITE_DESTINATION_PATH")"
